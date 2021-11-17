@@ -3,92 +3,84 @@ import {SettingsBlock} from "./components/Settings/SettingsBlock";
 import {CounterBlock} from "./components/Counter/CounterBlock";
 import {Button} from "./components/Button/Button";
 import './App.css';
+import {useDispatch, useSelector} from "react-redux";
+import {AppRootStateType} from "./state/store";
+import {increaseValueAC, setCounterValueAC, setMaxValueAC, setStartValueAC} from "./state/counterReducer";
 
 
 function App() {
 
-    let [startValue, setStartValue] = useState<number>(0)
-    let [maxValue, setMaxValue] = useState<number>(5)
-    let [counterValue, setCounterValue] = useState<number>(startValue)
+    let dispatch = useDispatch()
+    let startValue = useSelector<AppRootStateType, number>(state => state.counter.startValue)
+    let maxValue = useSelector<AppRootStateType, number>(state => state.counter.maxValue)
+    let counterValue = useSelector<AppRootStateType, number>(state => state.counter.counterValue)
+
+
     let [error, setError] = useState<boolean>(false)
     let [settingsMode, setSettingsMode] = useState<boolean>(true)
+
 
     const setDisabled = !settingsMode || error;
     const setDisabledForInc = counterValue === maxValue || error || settingsMode
     const setDisabledForReset = maxValue === startValue || error || settingsMode
 
-    const changeValue = (e: ChangeEvent<HTMLInputElement>) => {
 
+//изменяет значение в инпутах
+    const changeValue = (e: ChangeEvent<HTMLInputElement>) => {
         let currentValue = Number(e.currentTarget.value)
         setSettingsMode(true)
+
         switch (e.currentTarget.name) {
             case 'startValue':
-                setStartValue(currentValue);
+                dispatch(setStartValueAC(currentValue))
                 break;
             case 'maxValue':
-                setMaxValue(currentValue);
+                dispatch(setMaxValueAC(currentValue))
                 break;
         }
-        setError(false)
     }
-    useEffect(() => {
-        let startValueInLS = localStorage.getItem('startValue')
-        let maxValueInLS = localStorage.getItem('maxValue')
-        if (startValueInLS) {
-            setStartValue(JSON.parse(startValueInLS))
-            setCounterValue(JSON.parse(startValueInLS))
-        }
-        if (maxValueInLS) {
-            setMaxValue(JSON.parse(maxValueInLS))
-        }
-    }, [])
 
     useEffect(() => {
-        if (startValue < 0 || startValue >= maxValue) {
+        if (startValue >= maxValue || startValue < 0) {
             setError(true)
         } else {
-            localStorage.setItem('startValue', JSON.stringify(startValue))
-            localStorage.setItem('maxValue', JSON.stringify(maxValue))
+            setError(false)
         }
     }, [startValue, maxValue])
 
-
-    const increaseHandler = () => {
-        setCounterValue(counterValue => counterValue + 1)
+//увеличивает значение в счетчике
+    const increaseValue = () => {
+        dispatch(increaseValueAC())
     }
 
-    const resetHandler = () => {
-        setCounterValue(startValue)
-        /*setSettingsMode(false)*/
-    }
-    const setHandler = () => {
+//устанавливает значение счетчика
+    const setCounterValue = () => {
         if (!error) {
-            setCounterValue(startValue)
+            dispatch(setCounterValueAC(startValue))
             setSettingsMode(false)
         }
     }
 
-
     return (
-            <div className="cover">
+        <div className="cover">
 
-                <div className={'settingsBlock'}>
-                    <SettingsBlock startValue={startValue}
-                                   maxValue={maxValue}
-                                   changeValue={changeValue}
-                                   error={error}/>
-                    <Button title='set' callback={setHandler} disabled={setDisabled}/>
-                </div>
-                <div className={'counterBlock'}>
-                    <CounterBlock counterValue={counterValue}
-                                  maxValue={maxValue}
-                                  error={error}
-                                  settingsMode={settingsMode}/>
-                    <Button title='inc' callback={increaseHandler} disabled={setDisabledForInc}/>
-                    <Button title='reset' callback={resetHandler} disabled={setDisabledForReset}/>
-                </div>
-
+            <div className={'settingsBlock'}>
+                <SettingsBlock startValue={startValue}
+                               maxValue={maxValue}
+                               changeValue={changeValue}
+                               error={error}/>
+                <Button title='set' callback={setCounterValue} disabled={setDisabled}/>
             </div>
+            <div className={'counterBlock'}>
+                <CounterBlock counterValue={counterValue}
+                              maxValue={maxValue}
+                              error={error}
+                              settingsMode={settingsMode}/>
+                <Button title='inc' callback={increaseValue} disabled={setDisabledForInc}/>
+                <Button title='reset' callback={setCounterValue} disabled={setDisabledForReset}/>
+            </div>
+
+        </div>
     );
 }
 
