@@ -17,11 +17,9 @@ export const counterReducer = (state: CounterStateType = initialState, action: A
             return {...state, counterValue: state.counterValue + 1}
 
         case "SET-COUNTER-VALUE":
-            return {...state, counterValue: action.value}
         case "SET-START-VALUE":
-            return {...state, startValue: action.value}
         case "SET-MAX-VALUE":
-            return {...state, maxValue: action.value}
+            return {...state, ...action.payload}
 
         default:
             return state
@@ -33,22 +31,22 @@ export const increaseValueAC = () => {
         type: 'INCREASE-VALUE'
     } as const
 }
-export const setCounterValueAC = (value: number) => {
+export const setCounterValueAC = (counterValue: number) => {
     return {
         type: 'SET-COUNTER-VALUE',
-        value
+        payload: {counterValue},
     } as const
 }
-export const setStartValueAC = (value: number) => {
+export const setStartValueAC = (startValue: number) => {
     return {
         type: 'SET-START-VALUE',
-        value
+        payload: {startValue},
     } as const
 }
-export const setMaxValueAC = (value: number) => {
+export const setMaxValueAC = (maxValue: number) => {
     return {
         type: 'SET-MAX-VALUE',
-        value
+        payload: {maxValue},
     } as const
 }
 
