@@ -1,32 +1,40 @@
 import React from 'react';
 import s from './CounterBlock.module.css'
+import {useSelector} from "react-redux";
+import {AppRootStateType} from "../../state/store";
+import {SettingsStateType} from "../../state/settingsReducer";
+import {CounterStateType} from "../../state/counterReducer";
 
-type CounterBlockType = {
-    counterValue: number
-    maxValue: number
-    error: boolean
-    settingsMode: boolean
-}
 
-export const CounterBlock = ({counterValue,maxValue, ...props}: CounterBlockType) => {
+export const CounterBlock = () => {
 
-    const setClass = props.error ? `${s.message} ${s.error}` : s.message
+    const {
+        counterValue,
+        maxValue,
+    } = useSelector<AppRootStateType, CounterStateType>(state => state.counter)
+
+    const {
+        error,
+        settingsMode,
+    } = useSelector<AppRootStateType, SettingsStateType>(state => state.settings)
+
+    const setClass = error ? `${s.message} ${s.error}` : s.message
     const setClassForCounterValue = counterValue >= maxValue ? `${s.counterValue} ${s.error}` : s.counterValue
 
 
     return (
 
             <div className={'counter'}>
-                {props.settingsMode &&
+                {settingsMode &&
                 <div className={setClass}>
-                    {props.error
+                    {error
                         ? `Enter correct values`
                         : `Enter values and press 'set'`}
                 </div>}
 
 
                 <div className={setClassForCounterValue}>
-                    {!props.error && counterValue}
+                    {!error && counterValue}
                 </div>
 
             </div>

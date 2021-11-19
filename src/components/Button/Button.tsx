@@ -1,16 +1,49 @@
 import React from 'react';
 import s from './Button.module.css'
+import {useSelector} from "react-redux";
+import {AppRootStateType} from "../../state/store";
+import {SettingsStateType} from "../../state/settingsReducer";
+import {CounterStateType} from "../../state/counterReducer";
 
-type ButtonType = {
+
+type ButtonPropsType = {
     title: string
     callback: () => void
-    disabled: boolean
 }
 
-export const Button = ({title, callback, ...props}: ButtonType) => {
-    const setClass = props.disabled ? `${s.button} ${s.disabled}` : s.button
+export const Button: React.FC<ButtonPropsType> = ({title, callback}) => {
 
-    return <button className={setClass} onClick={callback} disabled={props.disabled}>
+    const {
+        error,
+        settingsMode,
+    } = useSelector<AppRootStateType, SettingsStateType>(state => state.settings)
+
+    const {
+        startValue,
+        maxValue,
+        counterValue,
+    } = useSelector<AppRootStateType, CounterStateType>(state => state.counter)
+
+    const setDisabletForButton = (title: string) => {
+        let isDisabled = false;
+        switch (title) {
+            case 'set' :
+                return !settingsMode || error;
+            case 'inc' :
+                return counterValue === maxValue || error || settingsMode;
+            case 'reset' :
+                return maxValue === startValue || error || settingsMode;
+
+            default:
+                return isDisabled
+        }
+    }
+    let disabled = setDisabletForButton(title)
+
+
+    const setClass = disabled ? `${s.button} ${s.disabled}` : s.button
+
+    return <button className={setClass} onClick={callback} disabled={disabled}>
         {title}
     </button>
 

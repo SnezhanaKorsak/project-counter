@@ -1,8 +1,10 @@
 import {combineReducers, createStore} from "redux";
 import {counterReducer} from "./counterReducer";
+import {settingsReducer} from "./settingsReducer";
 
 export const rootReducer = combineReducers({
-    counter: counterReducer
+    counter: counterReducer,
+    settings: settingsReducer,
 })
 
 let preloadedState;

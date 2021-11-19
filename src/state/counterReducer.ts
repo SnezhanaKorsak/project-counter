@@ -3,7 +3,7 @@ const initialState = {
     maxValue: 5,
     counterValue: 0,
 }
-type InitialStateType = typeof initialState
+export type CounterStateType = typeof initialState
 
 type ActionsType = ReturnType<typeof increaseValueAC>
     | ReturnType<typeof setCounterValueAC>
@@ -11,7 +11,7 @@ type ActionsType = ReturnType<typeof increaseValueAC>
     | ReturnType<typeof setMaxValueAC>
 
 
-export const counterReducer = (state: InitialStateType = initialState, action: ActionsType): InitialStateType => {
+export const counterReducer = (state: CounterStateType = initialState, action: ActionsType): CounterStateType => {
     switch (action.type) {
         case "INCREASE-VALUE":
             return {...state, counterValue: state.counterValue + 1}
